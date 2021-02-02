@@ -1,0 +1,26 @@
+Package: eicu
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R:
+    person(given = "Aaron",
+           family = "Conway",
+           role = c("aut", "cre"),
+           email = "aaron.conway@utoronto.ca",
+           comment = c(ORCID = "0000-0002-9583-8636"))
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Suggests:
+    dbplyr,
+    bigrquery,  
+    DBI,    
+    glmnet,
+    randomForest,
+    xgboost
+Imports: 
+    magrittr
+Remotes:
+    ropensci/targets
