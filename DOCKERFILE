@@ -1,4 +1,4 @@
-FROM rocker/tensorflow:latest
+FROM rocker/ml-verse
 
 RUN install2.r --error \
     embed \
