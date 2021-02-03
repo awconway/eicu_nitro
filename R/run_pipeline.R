@@ -1,5 +1,4 @@
 #' @importFrom targets tar_make tar_read
-#' @importFrom beepr beep
 #' @importFrom dplyr distinct pull summarise filter select
 #' @export
 
@@ -176,7 +175,4 @@ run_pipeline <- function() {
   print(tar_read(ridge_vip_plot))
   print(tar_read(ridge_plot))
 
-  # Notification ------------------------------------------------------------
-
-  beepr::beep()
 }

@@ -1,12 +1,14 @@
 FROM rocker/ml-verse
 
 RUN install2.r --error \
+    tidymodels \
     embed \
-    beepr \
     bigrquery \
     DBI \
     glue \
-    stacks
+    stacks \
+    randomForest \
+    xgboost
 
 RUN installGithub.r \
-    ropensci/targets
+    ropensci/targets 

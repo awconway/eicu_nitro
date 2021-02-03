@@ -19,10 +19,10 @@ query_cols <- function(connection, table, columns) {
   )
   query <- glue("
 SELECT {columns}
-FROM   `physionet-data.eicu_crd.{table}` {table}
+FROM   `eicu-273519.eicu.{table}` {table}
 WHERE  {table}.patientunitstayid IN (SELECT INFUSION.patientunitstayid
                                           FROM
-       `physionet-data.eicu_crd.infusiondrug`
+       `eicu-273519.eicu.infusiondrug`
        INFUSION
                                           WHERE
               INFUSION.drugname = 'Nitroglycerin (mcg/min)')

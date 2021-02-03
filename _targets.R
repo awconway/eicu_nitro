@@ -4,7 +4,9 @@ suppressPackageStartupMessages(library(dplyr))
 library(magrittr)
 suppressPackageStartupMessages(library(tidymodels))
 library(embed)
-
+#upload your service account token from bigquery
+#https://gargle.r-lib.org/articles/get-api-credentials.html#service-account-token
+bigrquery::bq_auth(path = "token.json")
 devtools::load_all()
 
 # Other predictors to add:
@@ -18,7 +20,8 @@ list(
 
   # Load data from bigquery -------------------------------------------------
 
-  tar_target(eicu_conn, make_connection(billing = "eicu-273519")),
+  tar_target(eicu_conn, make_connection(billing = "eicu-273519",
+                                        dataset = "eicu")),
 
 
   tar_target(
@@ -631,7 +634,7 @@ list(
 
   tar_target(keras_wflow, workflow() %>%
     add_recipe(base_rec) %>%
-    add_model(keras_tune_pra)),
+    # add_model(keras_tune_pra)),
 
   tar_target(
     keras_fit,
@@ -644,10 +647,9 @@ list(
   tar_target(keras_metrics, keras_fit %>%
     collect_metrics()),
 
-  # on inspection the best rmse (12.8) had 9 hidden units and 200 epochs
-  # tar_target(keras_best, keras_fit$.metrics[5][[1]][5,] %>%
-  #              select(hidden_units, penalty, epochs,.config)),
-  #
+  tar_target(keras_best, keras_fit %>%
+               select_best("rmse")),
+  
   # tar_target(keras_final, finalize_workflow(
   #              keras_wflow, keras_best)),
 

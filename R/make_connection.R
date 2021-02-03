@@ -1,16 +1,17 @@
 #' @title Connect with database
 
-#' @returns Connection to eicu_crd database from 
-#' physionet-data in bigquery
+#' @returns Connection to eicu database from 
+#' your copy of physionet-data in bigquery
 #' @param billing Account for billing in bigquery
+#' @param dataset name of bigquery dataset where 
+#' eicu data has been copied into
 #' @importFrom DBI dbConnect
-#' @importFrom bigrquery bigquery bq_auth
+#' @importFrom bigrquery bigquery
 #' @export
-make_connection <- function(billing) {
-
+make_connection <- function(billing, dataset) {
   eicu_nitro <- dbConnect(bigquery(), 
-                               project = "physionet-data", 
-                               dataset = "eicu_crd",
-                               billing = "eicu-273519")
+                               project = billing, 
+                               dataset = dataset,
+                               billing = billing)
 
 }
