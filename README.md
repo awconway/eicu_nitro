@@ -2,7 +2,7 @@
 
 <!-- badges: start -->
 
-![Docker Cloud Build Status](<https://img.shields.io/docker/cloud/build/awconway/eicu_nitro)>
+![Docker Cloud Build Status](<https://img.shields.io/docker/cloud/build/awconway/eicu_nitro)
 
 <!-- badges: end -->
 
