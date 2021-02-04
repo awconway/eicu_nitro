@@ -55,7 +55,7 @@ Instead of installing docker on your system you can run it on a remote server, s
 First, follow the instructions to gain access through [physionet](https://eicu-crd.mit.edu). Once you have access to the data on bigquery, run the following code in the RStudio session and follow instructions in a pop-up browser to copy your token to the console:
 
 ```r
-bigquery::bq_auth(email = "your gmail address associated with physionet account",
+bigrquery::bq_auth(email = "your gmail address associated with physionet account",
                   use_oob = TRUE)
 ```
 
