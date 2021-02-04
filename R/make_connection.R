@@ -8,9 +8,11 @@
 #' @importFrom DBI dbConnect
 #' @importFrom bigrquery bigquery
 #' @export
-make_connection <- function(billing, dataset) {
+make_connection <- function(project,
+                            dataset,
+                            billing) {
   eicu_nitro <- dbConnect(bigquery(), 
-                               project = billing, 
+                               project = project, 
                                dataset = dataset,
                                billing = billing)
 

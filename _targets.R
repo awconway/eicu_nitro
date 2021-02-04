@@ -4,9 +4,7 @@ suppressPackageStartupMessages(library(dplyr))
 library(magrittr)
 suppressPackageStartupMessages(library(tidymodels))
 library(embed)
-#upload your service account token from bigquery
-#https://gargle.r-lib.org/articles/get-api-credentials.html#service-account-token
-bigrquery::bq_auth(path = "token.json")
+
 devtools::load_all()
 
 # Other predictors to add:
@@ -20,8 +18,9 @@ list(
 
   # Load data from bigquery -------------------------------------------------
 
-  tar_target(eicu_conn, make_connection(billing = "eicu-273519",
-                                        dataset = "eicu")),
+  tar_target(eicu_conn, make_connection(project = "physionet-data",
+                                        dataset = "eicu_crd",
+                                        billing = "eicu-273519")),
 
 
   tar_target(
@@ -634,7 +633,7 @@ list(
 
   tar_target(keras_wflow, workflow() %>%
     add_recipe(base_rec) %>%
-    # add_model(keras_tune_pra)),
+    add_model(keras_tune_pra)),
 
   tar_target(
     keras_fit,

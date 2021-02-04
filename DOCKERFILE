@@ -8,7 +8,9 @@ RUN install2.r --error \
     glue \
     stacks \
     randomForest \
-    xgboost
+    xgboost \
+    vip \
+    styler
 
 RUN installGithub.r \
     ropensci/targets 

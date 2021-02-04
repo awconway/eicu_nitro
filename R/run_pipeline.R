@@ -13,11 +13,11 @@ run_pipeline <- function() {
   cli::cli_h1("Model summary")
   print(targets::tar_read(base_rec)$var_info %>%
     select(-source),
-    n = Inf)
+  n = Inf
+  )
   print(targets::tar_read(base_rec))
   cli::cli_end()
 
-#>   My list: foo & bar & foobar.
   # Summary of data ---------------------------------------------------------
 
   cli::cli_h1("Summary of data used in modelling")
@@ -174,5 +174,4 @@ run_pipeline <- function() {
 
   print(tar_read(ridge_vip_plot))
   print(tar_read(ridge_plot))
-
 }

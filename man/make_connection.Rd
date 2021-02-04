@@ -4,13 +4,13 @@
 \alias{make_connection}
 \title{Connect with database}
 \usage{
-make_connection(billing, dataset)
+make_connection(project, dataset, billing)
 }
 \arguments{
-\item{billing}{Account for billing in bigquery}
-
 \item{dataset}{name of bigquery dataset where
 eicu data has been copied into}
+
+\item{billing}{Account for billing in bigquery}
 }
 \value{
 Connection to eicu database from
