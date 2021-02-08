@@ -20,6 +20,8 @@ RUN apt-get update \
     && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends libcurl4-openssl-dev \
     libssl-dev \
+    build-essential \
+    libxml2 \
     libxml2-dev \
     python3-pip \
     libxt6
