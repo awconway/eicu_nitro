@@ -19,8 +19,7 @@ Suggests:
     DBI,    
     glmnet,
     randomForest,
-    xgboost
+    xgboost,
+    languageserver
 Imports: 
     magrittr
-Remotes:
-    ropensci/targets
