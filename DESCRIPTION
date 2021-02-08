@@ -20,6 +20,8 @@ Suggests:
     glmnet,
     randomForest,
     xgboost,
-    languageserver
+    languageserver,
+    jsonlite,
+    rlang
 Imports: 
     magrittr
