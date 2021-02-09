@@ -1,6 +1,5 @@
 {
-	"name": "R (Community)",
-	//"image": "awconway/eicu_nitro_vscode:latest",
+	"name": "eicu_nitro",
 	"build": {
 		"dockerfile": "Dockerfile",
 	},
@@ -10,7 +9,6 @@
 	"settings": {
 		"terminal.integrated.shell.linux": "/bin/bash",
 		"r.sessionWatcher": true,
-		"r.rterm.linux": "/usr/local/bin/R",
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.

@@ -1,4 +1,14 @@
-FROM rocker/ml:4.0.2-cuda10.1
+FROM rocker/tidyverse
+
+RUN install2.r --error \
+    tidymodels \
+    embed \
+    bigrquery \
+    stacks \
+    randomForest \
+    xgboost \
+    vip \
+    targets
 
 # [Option] Install zsh
 ARG INSTALL_ZSH="true"
