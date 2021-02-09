@@ -12,12 +12,12 @@
 		"r.alwaysUseActiveTerminal": true,
 		"r.bracketedPaste": true,
 		"r.sessionWatcher": true,
-		"r.rterm.linux": "/usr/local/bin/radian",
+		"r.rterm.linux": "/opt/venv/reticulate/bin/radian",
 		"r.rterm.option": [
 		  ""
 		],
 		"r.autoDetect": "false",
-		"r.terminalPath": "/usr/local/bin/radian",
+		"r.terminalPath": "/opt/venv/reticulate/bin/radian",
 		"r.interpreterPath": "/usr/local/bin/R",
 	},
 
