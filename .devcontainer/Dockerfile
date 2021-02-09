@@ -14,17 +14,3 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && /bin/bash /tmp/library-scripts/common-debian.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" \
     && apt-get -y install libzip-dev \
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/library-scripts
-
-# [Optional] Uncomment this section to install additional OS packages.
-RUN apt-get update \
-    && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends libcurl4-openssl-dev \
-    libssl-dev \
-    build-essential \
-    libxml2 \
-    libxml2-dev \
-    python3-pip \
-    libxt6
-
-RUN python3 -m pip install setuptools
-
