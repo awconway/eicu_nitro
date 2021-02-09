@@ -15,9 +15,5 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install libzip-dev \
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/library-scripts
 
-# Needed for igraph
+# Needed for igraph in targets
 RUN apt-get update && apt-get install -y libglpk40
-
-# radian
-
-RUN pip3 install radian
