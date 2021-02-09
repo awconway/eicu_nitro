@@ -959,7 +959,7 @@
       "Version": "0.12.0",
       "Source": "Repository",
       "Repository": "RSPM",
-      "Hash": "5c0cdb37f063c58cdab3c7e9fbb8bd2c"
+      "Hash": "7340c71f46a0fd16506cfa804e224e44"
     },
     "reticulate": {
       "Package": "reticulate",
