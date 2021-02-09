@@ -1,9 +1,9 @@
 {
 	"name": "R (Community)",
-	"image": "awconway/eicu_nitro_vscode:latest",
-	// "build": {
-	// 	"dockerfile": "Dockerfile",
-	// },
+	//"image": "awconway/eicu_nitro_vscode:latest",
+	"build": {
+		"dockerfile": "Dockerfile",
+	},
 	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
 
 	// Set *default* container specific settings.json values on container create.
