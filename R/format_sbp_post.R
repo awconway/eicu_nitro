@@ -14,10 +14,11 @@ format_sbp_post <- function(df) {
 
   df %>%
     mutate(
-      sbp_sys_nurse_post = sbp_sys_nurse,
-      sbp_sys_post = as.numeric(sbp_sys),
-      sbp_ni_post = as.numeric(sbp_ni),
-      sbp_ni_nurse_post = sbp_ni_nurse,
+      sbp_post = sbp,
+      # sbp_sys_nurse_post = sbp_sys_nurse,
+      # sbp_sys_post = as.numeric(sbp_sys),
+      # sbp_ni_post = as.numeric(sbp_ni),
+      # sbp_ni_nurse_post = sbp_ni_nurse,
       time_post = time_since_nitro
     )
 }

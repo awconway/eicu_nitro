@@ -1,0 +1,59 @@
+
+---
+title: "Data for models information"
+output: html_document
+---
+
+## Participants in training and testing splits
+
+```{r results='asis'}
+glue::glue(
+"**Training dataset contains {
+  nrow(targets::tar_read(training))
+  } observations from {
+    targets::tar_read(training) %>%
+                 distinct(id) %>%
+                 nrow()
+                 } patients across {
+                   targets::tar_read(training) %>%
+                 distinct(hospitalid) %>%
+                 nrow()
+                 } hospitals**"
+                 )
+```
+```{r results='asis'}
+glue::glue(
+"**Testing dataset contains {
+  nrow(targets::tar_read(testing))
+  } observations from {
+    targets::tar_read(testing) %>%
+                 distinct(id) %>%
+                 nrow()
+                 } patients across {
+                   targets::tar_read(testing) %>%
+                 distinct(hospitalid) %>%
+                 nrow()
+                 } hospitals**"
+                 )
+```
+
+
+## Baseline metric for comparison
+
+The predictions need to be better than just passing in the 'pre' sbp as a prediction - we'll call this the baseline.
+
+```{r}
+glue::glue("
+RMSE to beat for training data is {
+  round(targets::tar_read(baselineTraining)$.estimate[[1]], 2)
+}
+")
+```
+
+```{r}
+glue::glue("
+RMSE to beat for testing data is {
+  round(targets::tar_read(baselineTesting)$.estimate[[1]], 2)
+}
+")
+```

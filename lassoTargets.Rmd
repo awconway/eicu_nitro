@@ -1,0 +1,84 @@
+---
+title: "Lasso model targets"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+library(targets)
+library(tidymodels)
+```
+
+## Specifications for the lasso model
+
+```{targets specLasso, tar_simple = TRUE}
+  linear_reg(
+    penalty = tune(),
+    mixture = 1
+  ) |>
+    set_engine("glmnet")
+```
+
+## Grid search to determine the best value for the penaly parameter (i.e. amount of regularization)
+
+```{targets gridLasso, tar_simple = TRUE }
+  dials::grid_regular(dials::penalty(),
+    levels = 100
+  )
+```
+
+## Recipe for the model
+
+Preprocessing steps include normalization, a Yeo-Johnson transformation for variables with many zero values and principal components analysis for the variables that are highly correlated.
+
+**Predictors used here are restricted to those that can be derived from just a medication infusion device and physiolgical monitoring device. Clinical preditors (age, gender, medical conditions etc) were not included.**
+
+```{targets recLasso, tar_simple = TRUE }
+  recipe(sbp_post ~
+  sbp_pre +
+    nitro_diff_mcg +
+    total_nitro +
+    n_nitro +
+    nitro_time +
+     sbp_pre_mean_60 +
+     sbp_pre_sd_60,
+    data = training
+  ) |>
+    step_YeoJohnson(
+      n_nitro, nitro_time, total_nitro, sbp_pre_sd_60
+    ) |>
+    step_normalize(
+      all_numeric_predictors()
+    )|>
+    step_pca(
+    sbp_pre_mean_60,
+    sbp_pre
+    )
+```
+
+## Run the model using 5-fold cross-validation
+
+```{targets workflowLasso, tar_simple = TRUE}
+workflow()|>
+    add_recipe(recLasso)|>
+    add_model(specLasso)
+```
+
+```{targets tuningLasso, tar_simple = TRUE}
+    tune_grid(
+     workflowLasso,
+      resamples = foldsFive,
+      grid = gridLasso
+    )
+```
+
+## Final model selection and fitting
+
+Only run when predictor set and parameters for the model are selected.
+
+```{targets lassoFinal, tar_simple = TRUE}
+# best <- select_best(tuningLasso)
+# lasso_best <- finalize_workflow(
+#     workflowLasso, best
+# )
+# last_fit(lasso_best, initSplit)
+```

@@ -18,16 +18,24 @@ run_pipeline <- function() {
   print(targets::tar_read(base_rec))
   cli::cli_end()
 
+  cli::cli_h1("XGboost model summary")
+  print(targets::tar_read(boost_rec)$var_info %>%
+    select(-source),
+  n = Inf
+  )
+  print(targets::tar_read(boost_rec))
+  cli::cli_end()
+
   # Summary of data ---------------------------------------------------------
 
   cli::cli_h1("Summary of data used in modelling")
   cli::cli_alert_info("Training dataset contains {.val
-  {nrow(tar_read(training))}
+  {nrow(tar_read(invasiveTraining))}
   } observations from {.val
-                 {tar_read(training) %>%
+                 {tar_read(invasiveTraining) %>%
                  distinct(id) %>%
                  nrow()}} patients across {.val
-                 {tar_read(testing) %>%
+                 {tar_read(invasiveTraining) %>%
                  distinct(hospitalid) %>%
                  nrow()}} hospitals")
   cli::cli_alert_info("Testing dataset contains {.val
@@ -56,19 +64,20 @@ run_pipeline <- function() {
   # XGBoost model -----------------------------------------------------------
 
   cli::cli_h1("Metrics from cross-validated XGboost model")
-  boost_rmse <- round(tar_read(boost_metrics)$mean[[1]], 2)
+  boost_rmse <- tar_read(boost_metrics)|>
+  summarize(min = min(mean))
   if (boost_rmse < baseline_rmse) {
     cli::cli_alert_success("RMSE was {.val {boost_rmse}}")
   } else {
     cli::cli_alert_danger("RMSE was {.val {boost_rmse}}")
   }
 
-  boost_rsq <- round(tar_read(boost_metrics)$mean[[2]], 2)
-  if (boost_rsq > baseline_rsq) {
-    cli::cli_alert_success("R2 was {.val {boost_rsq}}")
-  } else {
-    cli::cli_alert_danger("R2 was {.val {boost_rsq}}")
-  }
+  # boost_rsq <- round(tar_read(boost_metrics)$mean[[2]], 2)
+  # if (boost_rsq > baseline_rsq) {
+  #   cli::cli_alert_success("R2 was {.val {boost_rsq}}")
+  # } else {
+  #   cli::cli_alert_danger("R2 was {.val {boost_rsq}}")
+  # }
   cli::cli_end()
 
   # Random forest model -----------------------------------------------------
@@ -141,7 +150,7 @@ run_pipeline <- function() {
   print(tar_read(lasso_vip_plot))
   print(tar_read(lasso_plot))
 
-  # Lasso model -------------------------------------------------------------
+  # Ridge model -------------------------------------------------------------
 
   cli::cli_h1("Metrics from cross-validated ridge model")
 

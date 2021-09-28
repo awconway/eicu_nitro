@@ -13,9 +13,5 @@ make_sbp(df)
 
 }
 \description{
-This function will create a variable called \code{sbp}
-that takes the value of either the non-invasive or systemic
-blood pressure from the vitalaperiodic, vitalperiodic and
-nursecharting tables. It preferentially takes the systemic
-measurement when both systemic and non-invasive is available.
+Filters out noninvasive bp over 250mmHg
 }

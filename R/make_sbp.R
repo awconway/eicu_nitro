@@ -1,9 +1,5 @@
 #' make_sbp
-#' @description This function will create a variable called `sbp`
-#' that takes the value of either the non-invasive or systemic
-#' blood pressure from the vitalaperiodic, vitalperiodic and
-#' nursecharting tables. It preferentially takes the systemic
-#' measurement when both systemic and non-invasive is available.
+#' @description Filters out noninvasive bp over 250mmHg
 #'
 #' @param df data frame produced from make_infusions
 #' @importFrom dplyr mutate coalesce

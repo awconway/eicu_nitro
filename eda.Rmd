@@ -1,0 +1,173 @@
+---
+title: EDA
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+```
+
+## distributions of features
+
+```{r}
+ edaData <- recipe(sbp_post ~ sbp_pre +
+    nitro_pre +
+    nitro_post +
+    nitro_diff_mcg +
+    total_nitro +
+    n_nitro +
+    nitro_time +
+    sbp_pre_mean_60 +
+    sbp_pre_mean_120 +
+    sbp_pre_median_60 +
+    sbp_pre_sd_60+
+    sbp_pre_sd_120,
+    data = targets::tar_read(training)
+  ) |>
+    #these predictors are right skewed (many zeros)
+    step_YeoJohnson(
+       nitro_time, total_nitro, n_nitro, sbp_pre_sd_60
+    ) |>
+    step_normalize(
+     all_numeric_predictors()
+    )|>
+    prep()|>
+    juice()
+```
+
+```{r}
+edaData|>
+ggplot(aes(x = n_nitro))+
+geom_histogram(bins=200)
+```
+```{r}
+edaData|>
+ggplot(aes(x = nitro_diff_mcg))+
+geom_histogram(bins=200)
+```
+
+
+## sbp diff and nitro diff
+
+```{r}
+targets::tar_read(training)|>
+ggplot(aes(x=nitro_diff_mcg, y=sbp_diff))+
+geom_point()
+```
+
+
+## sbp post and sbp_pre_mean_60
+```{r}
+edaData|>
+ggplot(aes(x = sbp_pre_mean_60))+
+geom_histogram(bins = 200)
+```
+```{r}
+edaData|>
+ggplot(aes(x=sbp_pre_mean_60, y=sbp_post))+
+geom_point()+
+geom_smooth(method="lm")
+```
+```{r}
+edaData|>
+ggplot(aes(x=sbp_pre, y=sbp_post))+
+geom_point() +
+geom_smooth(method="lm")
+```
+
+sbp_median_60 is pretty much just sbp_pre - sbp_mean_60 is a little more sensitive to other values over the previous hour. maybe shoud look into a measure of how varied the bp was in the previous time period as a feature? 
+
+```{r}
+targets::tar_read(training)|>
+ggplot(aes(x=sbp_pre, y=sbp_pre_mean_60))+
+geom_point() +
+geom_smooth(method="lm")
+```
+
+
+```{r}
+edaData|>
+ggplot(aes(x=sbp_pre, y=sbp_pre_median_60))+
+geom_point() +
+geom_smooth(method="lm")
+```
+
+Doesn't seem to be much to gain from lengthening the rolling average window to 2 hours
+```{r}
+edaData|>
+ggplot(aes(x=sbp_post, y=sbp_pre_sd_60))+
+geom_point() +
+geom_smooth(method="lm")
+```
+
+## rolling volatility of previous blood pressure measurements (standard deviation)
+```{r}
+edaData|>
+ggplot(aes(x=sbp_pre_mean_60, y=sbp_pre_sd_60))+
+geom_point() +
+geom_smooth(method="lm")
+```
+```{r}
+targets::tar_read(training)|>
+ggplot(aes(x=sbp_diff, y=sbp_pre_sd_120))+
+geom_point() +
+geom_smooth(method="lm")
+```
+```{r}
+edaData|>
+ggplot(aes(x=sbp_pre_sd_60, y=sbp_pre_sd_120))+
+geom_point() +
+geom_smooth(method="lm")
+```
+
+```{r}
+cor.test(edaData$sbp_pre_sd_60, edaData$sbp_pre_sd_120)
+```
+
+```{r}
+edaData|>
+ggplot(aes(x = sbp_pre_sd_60))+
+geom_histogram(bins = 200)
+```
+
+## Time on nitro
+
+- As time on nitro progresses, the difference in sbp from pre to post nitro titration seems to be more centered around zero. 
+- May be an interaction with dosage??
+- Plots look very similar between nitro_time and time except 
+
+```{r}
+targets::tar_read(training)|>
+ggplot(aes(x=sbp_diff, y=nitro_time, colour = nitro_diff_mcg))+
+geom_point() 
+```
+
+```{r}
+targets::tar_read(training)|>
+ggplot(aes(x=sbp_diff, y=time))+
+geom_point()
+```
+
+Time and time on nitro is perfectly correlated for some and others nitro started from a non-zero time point. I think just using nitro_time is best considering bioplausibity of effect (i.e. less sensitive the more time on the infusion)
+
+```{r }
+targets::tar_read(training)|>
+ggplot(aes(x=nitro_time, y = time))+
+geom_point()
+```
+
+## Total nitro dose
+
+Would make sense that time on nitro and nitro_dose are not perfectly correlated. Some patients on low dose for long period and others on high dose for a short period.
+
+```{r }
+edaData|>
+ggplot(aes(x=total_nitro, y = nitro_time))+
+geom_point()+
+geom_smooth(method = "lm")
+```
+
+```{r}
+cor.test(edaData$total_nitro, edaData$nitro_time)
+```

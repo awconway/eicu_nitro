@@ -1,0 +1,18 @@
+
+---
+title: "XGboost model evaluation"
+output: html_document
+---
+
+```{r bestBoost}
+tune::show_best(targets::tar_read(tuningRaceBoost))|>
+gt::gt()
+```
+
+## Final model evaluation
+
+**Only run when predictor set and parameters for the model are selected.**
+
+```{r finalFitBoost}
+# targets::tar_read(boostFinal)|>collect_metrics()
+```

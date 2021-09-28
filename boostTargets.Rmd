@@ -1,0 +1,137 @@
+---
+title: "XGboost model targets"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+library(targets)
+library(tidymodels)
+```
+
+## Recipe for the model
+
+```{targets recBoost}
+tar_target(recBoost, recipe(sbp_post ~ sbp_pre +
+    nitro_pre +
+    nitro_diff_mcg +
+    total_nitro +
+    n_nitro +
+    nitro_time +
+    time_since_nitro +
+    sbp_pre_mean_60 +
+    sbp_pre_sd_60,
+  data = training
+  )|>
+  step_dummy(all_nominal_predictors())
+  )
+```
+
+## Model specification
+
+```{targets specBoost}
+tar_target(
+    specBoost,
+    boost_tree(
+      # trees = 500,
+      # min_n = 30,
+      # learn_rate = 0.015,
+      # sample_size = 0.5, #0.5 was best
+      # tree_depth = 1,
+      trees = tune(),
+      min_n = tune(),
+      mtry = tune(),
+      learn_rate = tune(),
+      sample_size = tune(),
+      tree_depth = tune(),
+      loss_reduction = tune()
+    ) |>
+      set_engine("xgboost")|>
+      set_mode("regression")
+  )
+```
+
+Model workflow
+
+```{targets workflowBoost}
+ tar_target(
+    workflowBoost,
+    workflow()|>
+    add_recipe(recBoost)|>
+    add_model(specBoost)
+  )
+```
+
+Grid search ranges for tuning model parameters
+
+```{targets gridBoost}
+tar_target(gridBoost,
+  grid_max_entropy(
+    tree_depth(c(8, 15)),
+    min_n(c(20L, 40L)),
+    mtry(c(4L, 6L)),
+    loss_reduction(),
+    sample_size = sample_prop(c(0.5,1.0)),
+    learn_rate(c(-3,-2)),
+    trees(c(500, 5000)),
+    size = 50
+    )
+  )
+```
+
+The tune_race_anova function can be used to speed up the process of finding suitable parameters for the model. Results are returned from 5-fold cross validation. 
+
+```{targets tuningRaceBoost}
+tar_target(tuningRaceBoost,
+      tune_race_anova(
+        workflowBoost,
+        foldsFive,
+        grid = gridBoost,
+        metrics = mset,
+        control = control_race(verbose_elim = TRUE)
+      )
+  )
+```
+
+A simple tuning grid is useful when interested in tuning just a couple of parameters.
+
+```{targets tuningGridBoost}
+# tar_target(tuningGridBoost,
+#       tune_grid(
+#        workflowBoost,
+#         foldsFive,
+#         grid = crossing(
+#           min_n = seq(30,40, 5)
+#     ),
+#         metrics = mset,
+#         control = control
+#       )
+#   )
+```
+
+Once parameters are chosen, we can check how they performed with 5-fold cross-validation.
+
+```{targets resampleBoost}
+# tar_target(resampleBoost,
+#   fit_resamples(
+#     specBoost,
+#     recBoost,
+#     resamples = foldsFive,
+#     control = controlResamples
+#          )
+# )
+```
+
+
+## Final model evaluation
+
+The best model from cross-validation is chosen to update the final workflow. The last_fit function trains and then tests with the testing data. 
+
+**Only run when predictor set and parameters for the model are selected.**
+
+```{targets boostFinal, tar_simple = TRUE}
+# best <-  select_by_one_std_err(tuningRaceBoost, "learn_rate")
+# boost_best <- finalize_workflow(
+#   workflowBoost, best
+# )
+# last_fit(boost_best, initSplit)
+```

@@ -4,45 +4,10 @@
 \alias{make_data_format}
 \title{Combine data from tables and format}
 \usage{
-make_data_format(
-  patient,
-  nitro,
-  sbp_nurse_charting,
-  vital_aperiodic,
-  vital_periodic,
-  apachepatientresult,
-  apachepredvar,
-  creat,
-  fentanyl,
-  midaz,
-  propofol,
-  dobutamine,
-  dex,
-  nicardipine,
-  amiodarone,
-  fluids,
-  milrinone,
-  epinephrine,
-  vasopressin,
-  diltiazem,
-  pain,
-  create_vasoactive_col = TRUE
-)
+make_data_format(df, create_vasoactive_col = TRUE)
 }
 \arguments{
-\item{patient}{dataframe from SQL query}
-
-\item{nitro}{dataframe from SQL query}
-
-\item{sbp_nurse_charting}{dataframe from SQL query}
-
-\item{vital_aperiodic}{dataframe from SQL query}
-
-\item{vital_periodic}{dataframe from SQL query}
-
-\item{apachepatientresult}{dataframe from SQL query}
-
-\item{creat}{dataframe from SQL query}
+\item{df}{df returned from join_tables}
 
 \item{create_vasoactive_col}{logial creates a column to
 indicate that a patient was receiving another infusion

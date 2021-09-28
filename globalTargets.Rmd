@@ -1,0 +1,28 @@
+---
+title: Global targets setup
+output: html_document
+---
+```{r setup, include=FALSE}
+library(targets)
+```
+
+
+1. We first define some global options/functions common to all targets.
+
+```{targets globalpackages, tar_globals = TRUE}
+options(tidyverse.quiet = TRUE)
+tar_option_set(packages = c("tidymodels", "ggplot2",
+  "dplyr", "eicu", "finetune"))
+```
+
+2. Run the targets pipeline.
+
+```{r}
+# tar_make()
+```
+
+3. Visualize the target dependency tree.
+
+```{r}
+# tar_visnetwork()
+```

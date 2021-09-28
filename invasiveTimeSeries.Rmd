@@ -1,0 +1,25 @@
+---
+title: Data for time series model
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(targets)
+```
+
+```{targets invasiveTimeSeriesData}
+  tar_target(invasiveTimeSeriesData, make_invasive(data_formatted))
+```
+
+```{r results='asis'}
+glue::glue(
+"**Testing dataset contains {
+  nrow(tar_read(invasiveTimeSeriesData))
+  } observations from {
+    tar_read(invasiveTimeSeriesData) %>%
+                 distinct(id) %>%
+                 nrow()
+                 } patients**"
+                 )
+```

@@ -1,0 +1,41 @@
+---
+title: "Model setup"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+library(targets)
+library(tidymodels)
+```
+
+
+## Model set-up
+
+```{targets mset}
+tar_target(
+    mset,
+    metric_set(rmse)
+  )
+```
+
+```{targets control}
+  tar_target(
+    control,
+    control_grid(
+      save_workflow = TRUE,
+      save_pred = TRUE,
+      extract = extract_model
+    )
+  )
+```
+
+```{targets controlResamples}
+  tar_target(
+    controlResamples,
+    control_resamples(
+      save_workflow = TRUE,
+      save_pred = TRUE,
+      extract = extract_model
+    )
+  )
+```

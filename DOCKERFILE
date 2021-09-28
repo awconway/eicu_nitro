@@ -10,7 +10,8 @@ RUN install2.r --error \
     randomForest \
     xgboost \
     vip \
-    styler
+    styler \
+    finetune
 
 RUN installGithub.r \
     ropensci/targets 

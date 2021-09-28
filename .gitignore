@@ -4,3 +4,7 @@
 .Ruserdata
 .Rbuildignore
 _targets
+*.html
+scratch.R
+Icon?
+.DS_Store

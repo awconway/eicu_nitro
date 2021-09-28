@@ -3,6 +3,7 @@
 #' had at least 5 nitro dose titrations (n=246)
 #' @param data_formatted target from pipeline
 #' @return data_invasive pipeline target
+#' @export
 make_invasive <- function(data_formatted) {
     inv_ids <- data_formatted %>%
         filter(sbp_measure == "invasive") %>%
