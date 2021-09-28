@@ -2,10 +2,10 @@ FROM rocker/ml-verse
 
 RUN install2.r --error \
     tidymodels \
-    embed \
     bigrquery \
     DBI \
     glue \
+    lme4 \
     stacks \
     randomForest \
     xgboost \
@@ -16,4 +16,5 @@ RUN install2.r --error \
     gtsummary
 
 RUN installGithub.r \
-    ropensci/targets 
+    ropensci/targets \
+    awconway/eicu_nitro
