@@ -2,10 +2,10 @@ FROM rocker/ml-verse
 
 RUN install2.r --error \
     tidymodels \
-    embed \
     bigrquery \
     DBI \
     glue \
+    lme4 \
     stacks \
     randomForest \
     xgboost \
