@@ -1,8 +1,9 @@
 {
 	"name": "eicu_nitro",
-	"build": {
-		"dockerfile": "Dockerfile",
-	},
+	"image": "awconway/eicu_nitro",
+	// "build": {
+	// 	"dockerfile": "Dockerfile",
+	// },
 	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
 
 	// Set *default* container specific settings.json values on container create.
@@ -16,6 +17,8 @@
 		// R extensions
 		"ikuyadeu.r",
 		"REditorSupport.r-lsp",
+		"hoovercj.vscode-settings-cycler",
+		"ms-azuretools.vscode-docker"
 		// Utility extensions, feel free to adjust them
 	]
 
