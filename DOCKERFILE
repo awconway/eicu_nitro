@@ -1,6 +1,9 @@
 FROM rocker/ml-verse
 
 RUN install2.r --error \
+    languageserver \
+    httpgd \
+    svglite \
     tidymodels \
     bigrquery \
     DBI \
@@ -11,7 +14,8 @@ RUN install2.r --error \
     xgboost \
     vip \
     styler \
-    finetune
+    finetune \
+    gt
 
 RUN installGithub.r \
     ropensci/targets \
