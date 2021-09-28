@@ -14,4 +14,5 @@ RUN install2.r --error \
     finetune
 
 RUN installGithub.r \
-    ropensci/targets 
+    ropensci/targets \
+    awconway/eicu_nitro
