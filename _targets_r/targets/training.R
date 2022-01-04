@@ -1,1 +1,1 @@
-  tar_target(training, training(initSplit))
+  tar_target(training, dataModel)

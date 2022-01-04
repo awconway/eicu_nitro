@@ -1,1 +1,1 @@
-  tar_target(foldsIndex, make_kfold(training, 5))
+  tar_target(foldsIndex, make_kfold(dataModel, 5))

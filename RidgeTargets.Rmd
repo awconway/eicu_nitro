@@ -1,5 +1,5 @@
 ---
-title: "Lasso model targets"
+title: "Ridge model targets"
 output: html_document
 ---
 
@@ -10,19 +10,18 @@ library(tidymodels)
 
 ## Specifications for the lasso model
 
-```{targets specLasso, tar_simple = TRUE}
+```{targets ridgeTargets, tar_simple = TRUE}
   linear_reg(
     penalty = tune(),
-    mixture = tune()
+    mixture = 0
   ) |>
     set_engine("glmnet")
 ```
 
 ## Grid search to determine the best value for the penaly parameter (i.e. amount of regularization)
 
-```{targets gridLasso, tar_simple = TRUE }
+```{targets gridRidge, tar_simple = TRUE }
   dials::grid_regular(dials::penalty(),
-                      dials::mixture(),
     levels = 100
   )
 ```
@@ -33,7 +32,7 @@ Preprocessing steps include normalization, a Yeo-Johnson transformation for vari
 
 **Predictors used here are restricted to those that can be derived from just a medication infusion device and physiolgical monitoring device. Clinical predictors (age, gender, medical conditions etc) were not included.**
 
-```{targets recLasso, tar_simple = TRUE }
+```{targets recRidge, tar_simple = TRUE }
   recipe(sbp_post ~
   sbp_pre +
     nitro_diff_mcg +
@@ -59,13 +58,13 @@ Preprocessing steps include normalization, a Yeo-Johnson transformation for vari
 
 ## Run the model using 5-fold cross-validation
 
-```{targets workflowLasso, tar_simple = TRUE}
+```{targets workflowRidge, tar_simple = TRUE}
 workflow()|>
     add_recipe(recLasso)|>
     add_model(specLasso)
 ```
 
-```{targets tuningLasso, tar_simple = TRUE}
+```{targets tuningRidge, tar_simple = TRUE}
     tune_grid(
      workflowLasso,
       resamples = foldsFive,

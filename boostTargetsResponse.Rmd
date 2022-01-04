@@ -1,5 +1,5 @@
 ---
-title: "XGboost model targets"
+title: "XGboost model response targets"
 output: html_document
 ---
 
@@ -10,8 +10,8 @@ library(tidymodels)
 
 ## Recipe for the model
 
-```{targets recBoost}
-tar_target(recBoost, recipe(sbp_post ~ sbp_pre +
+```{targets recBoostResponse}
+tar_target(recBoostResponse, recipe(sbp_post ~ sbp_pre +
     nitro_pre +
     nitro_diff_mcg +
     total_nitro +
@@ -20,18 +20,20 @@ tar_target(recBoost, recipe(sbp_post ~ sbp_pre +
     time_since_nitro +
     sbp_pre_mean_60 +
     sbp_pre_sd_60 +
-    pain_score,
-  data = training
+    pain_score +
+    lag_nitro_diff +
+    lag_sbp_diff,
+    data = trainingResponse
   )|>
   step_dummy(all_nominal_predictors())
-  )
+  ) #need to add interaction term 
 ```
 
 ## Model specification
 
-```{targets specBoost}
+```{targets specBoostResponse}
 tar_target(
-    specBoost,
+    specBoostResponse,
     boost_tree(
       # trees = 500,
       # min_n = 30,
@@ -53,9 +55,9 @@ tar_target(
 
 Model workflow
 
-```{targets workflowBoost}
+```{targets workflowBoostResponse}
  tar_target(
-    workflowBoost,
+    workflowBoostResponse,
     workflow()|>
     add_recipe(recBoost)|>
     add_model(specBoost)
@@ -64,8 +66,8 @@ Model workflow
 
 Grid search ranges for tuning model parameters
 
-```{targets gridBoost}
-tar_target(gridBoost,
+```{targets gridBoostResponse}
+tar_target(gridBoostResponse,
   grid_max_entropy(
     tree_depth(c(8, 15)),
     min_n(c(20L, 40L)),
@@ -81,12 +83,12 @@ tar_target(gridBoost,
 
 The tune_race_anova function can be used to speed up the process of finding suitable parameters for the model. Results are returned from 5-fold cross validation. 
 
-```{targets tuningRaceBoost}
-tar_target(tuningRaceBoost,
+```{targets tuningRaceBoostResponse}
+tar_target(tuningRaceBoostResponse,
       tune_race_anova(
         workflowBoost,
         foldsFive,
-        grid = gridBoost,
+        grid = gridBoostResponse,#is this gridBoostResponse or gridBoost
         metrics = mset,
         control = control_race(verbose_elim = TRUE)
       )
@@ -127,12 +129,3 @@ Once parameters are chosen, we can check how they performed with 5-fold cross-va
 
 The best model from cross-validation is chosen to update the final workflow. The last_fit function trains and then tests with the testing data. 
 
-**Only run when predictor set and parameters for the model are selected.**
-
-```{targets boostFinal, tar_simple = TRUE}
-# best <-  select_by_one_std_err(tuningRaceBoost, "learn_rate")
-# boost_best <- finalize_workflow(
-#   workflowBoost, best
-# )
-# last_fit(boost_best, initSplit)
-```

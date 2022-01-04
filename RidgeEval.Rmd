@@ -1,5 +1,5 @@
 ---
-title: "Lasso model evaluation"
+title: "Ridge model evaluation"
 output: html_document
 ---
 
@@ -13,23 +13,23 @@ library(tidymodels)
 We see that the lasso model performed better with lower amounts of regularization.
 
 ```{r}
-targets::tar_read(tuningLasso) |>
+targets::tar_read(tuningRidge) |>
 autoplot()
 ```
 
 ## Show the best models for the grid search
 
 ```{r}
-tune::show_best(targets::tar_read(tuningLasso))|>
+tune::show_best(targets::tar_read(tuningRidge))|>
 gt::gt()
 ```
 
 ## Assess varibale importance
 
 ```{r}
-best <- select_best(targets::tar_read(tuningLasso))
+best <- select_best(targets::tar_read(tuningRidge))
 lasso_best <- finalize_workflow(
-    targets::tar_read(workflowLasso), best
+    targets::tar_read(workflowRidge), best
 )
 
 lasso_best |>
@@ -44,12 +44,4 @@ ggplot(aes(x = Importance, y = Variable, fill = Sign)) +
     geom_col() +
     scale_x_continuous(expand = c(0, 0)) +
     labs(y = NULL)
-```
-
-## Final model evaluation
-
-Only run when predictor set and parameters for the model are selected.
-
-```{r}
-# targets::tar_read(lassoFinal)|>collect_metrics()
 ```

@@ -1,6 +1,5 @@
-tar_target(gridLasso, {
+tar_target(gridRidgeResponse, {
     dials::grid_regular(dials::penalty(),
-                        dials::mixture(),
       levels = 100
     )
 })

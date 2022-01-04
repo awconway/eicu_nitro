@@ -20,7 +20,7 @@ format_fill <- function(df) {
     fill(epinephrine_inf, .direction = "down") %>%
     fill(vasopressin_inf, .direction = "down") %>%
     fill(diltiazem_inf, .direction = "down") %>%
-    fill(pain_score, .direction = "down") %>%
+    # fill(pain_score, .direction = "down") %>%
     fill(nitro, .direction = "down") %>%
     replace_na(replace = list(nitro = 0,
     creat_lab = 0,
@@ -36,7 +36,7 @@ format_fill <- function(df) {
     epinephrine_inf = 0,
     vasopressin_inf = 0,
     diltiazem_inf = 0,
-    pain_score = 0
+    # pain_score = 0
     )) %>%
     ungroup()
 }

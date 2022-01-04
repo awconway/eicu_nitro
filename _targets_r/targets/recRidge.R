@@ -1,4 +1,4 @@
-tar_target(recLasso, {
+tar_target(recRidge, {
     recipe(sbp_post ~
     sbp_pre +
       nitro_diff_mcg +

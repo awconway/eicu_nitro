@@ -1,4 +1,4 @@
-tar_target(recLasso, {
+tar_target(recLassoResponse, {
     recipe(sbp_post ~
     sbp_pre +
       nitro_diff_mcg +
@@ -7,8 +7,10 @@ tar_target(recLasso, {
       nitro_time +
        sbp_pre_mean_60 +
        sbp_pre_sd_60 +
-      pain_score,
-      data = dataModel
+      pain_score +
+      lag_nitro_diff +
+      lag_sbp_diff,
+      data = trainingResponse
     ) |>
       step_YeoJohnson(
         n_nitro, nitro_time, total_nitro, sbp_pre_sd_60, pain_score
@@ -19,5 +21,7 @@ tar_target(recLasso, {
       step_pca(
       sbp_pre_mean_60,
       sbp_pre
-      )
+      ) |> 
+    step_interact(terms = ~lag_nitro_diff:lag_sbp_diff)
+  
 })

@@ -1,0 +1,82 @@
+---
+title: "Developing a Nitroglycerin Dose Titration Decision Support System"
+author:
+  - Navpreet Kamboj MScN:
+      institute: [LBFON]
+      correspondence: true
+  - Kelly Metcalfe PhD:
+      institute: [LBFON, WCH]
+      correspondence: false
+  - Charlene Chu PhD:
+      institute: [LBFON, KITE]
+      correspondence: false
+  - Aaron Conway PhD:
+      email: aaron.conway@utoronto.ca
+      phone: +1 416 946 7112
+      address: 585 University Ave | Toronto, ON  M5G 2N2
+      institute: [PMCC, LBFON, QUT]
+      correspondence: false
+
+institute:
+  - PMCC: Peter Munk Cardiac Centre, University Health Network, Toronto, Canada
+  - LBFON: Lawrence S. Bloomberg Faculty of Nursing, University of Toronto, Toronto, Canada
+  - QUT: School of Nursing, Queensland University of Technology (QUT), Brisbane, Australia
+  - KITE: KITE-Toronto Rehabilitation Institute, University Health Network, Toronto, Canada
+  - WCH: Women’s College Research Institute, Toronto, Canada
+
+output: html_document
+---
+
+\pagebreak
+Journal requirements
+generally should not exceed 3,500 words.
+The manuscript, including the title page, abstract and keywords, text, references, figure captions, and
+tables should be typewritten, double-spaced in 12-point font with 1-inch margins all around and saved
+as one file.
+
+### Abstract
+
+**Objective**
+
+
+
+**Research Methodology**
+
+**Results**
+
+
+
+**Conclusion**
+
+Keywords: nitroglycerin, vasoactive dose titration, clinical decision support system, nurses' decision making
+
+\pagebreak
+
+### Background and Significance
+
+### Objectives
+
+### Methods
+
+### Results
+
+### Discussion
+
+### Conclusions
+
+### Clinical Relevance Statement
+
+### Conflict of Interest
+The authors declare no competing interests.
+
+### Reference
+
+
+## Declarations
+This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors.
+
+Availability of data and material (data transparency): All data used in the meta-analyses is available [here](https://github.com/awconway/eicu_nitro).
+
+Code availability: All data used in the meta-analyses is available [here](https://github.com/awconway/eicu_nitro) and archived [here](https://doi.org/10.5281/zenodo.4419814).
+
+Author contributions: NK: Study design, analysis, wrote manuscript; AC: Study design, revised the manuscript for important intellectual content; KM: Study design, revised the manuscript for important intellectual content; CC: Study design, revised the manuscript for important intellectual content.

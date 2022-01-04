@@ -8,4 +8,5 @@ tar_target(dataModel, data_formatted |>
     distinct(n_nitro, .keep_all = T) |>
     ungroup() |>
     mutate(sbp_diff = sbp_post - sbp_pre, no_diff = 0)|>
-    na.omit())
+    na.omit()) 
+  

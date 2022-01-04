@@ -1,5 +1,5 @@
 ---
-title: "Lasso model targets"
+title: "Ridge model response targets"
 output: html_document
 ---
 
@@ -8,21 +8,20 @@ library(targets)
 library(tidymodels)
 ```
 
-## Specifications for the lasso model
+## Specifications for the ridge model
 
-```{targets specLasso, tar_simple = TRUE}
+```{targets specRidgeResponse, tar_simple = TRUE}
   linear_reg(
     penalty = tune(),
-    mixture = tune()
+    mixture = 0 #Changed from 1 to 0
   ) |>
     set_engine("glmnet")
 ```
 
 ## Grid search to determine the best value for the penaly parameter (i.e. amount of regularization)
 
-```{targets gridLasso, tar_simple = TRUE }
+```{targets gridRidgeResponse, tar_simple = TRUE }
   dials::grid_regular(dials::penalty(),
-                      dials::mixture(),
     levels = 100
   )
 ```
@@ -33,7 +32,7 @@ Preprocessing steps include normalization, a Yeo-Johnson transformation for vari
 
 **Predictors used here are restricted to those that can be derived from just a medication infusion device and physiolgical monitoring device. Clinical predictors (age, gender, medical conditions etc) were not included.**
 
-```{targets recLasso, tar_simple = TRUE }
+```{targets recRidgeResponse, tar_simple = TRUE }
   recipe(sbp_post ~
   sbp_pre +
     nitro_diff_mcg +
@@ -42,8 +41,10 @@ Preprocessing steps include normalization, a Yeo-Johnson transformation for vari
     nitro_time +
      sbp_pre_mean_60 +
      sbp_pre_sd_60 +
-    pain_score,
-    data = dataModel
+    pain_score +
+    lag_nitro_diff +
+    lag_sbp_diff,
+    data = trainingResponse
   ) |>
     step_YeoJohnson(
       n_nitro, nitro_time, total_nitro, sbp_pre_sd_60, pain_score
@@ -54,22 +55,24 @@ Preprocessing steps include normalization, a Yeo-Johnson transformation for vari
     step_pca(
     sbp_pre_mean_60,
     sbp_pre
-    )
+    ) |> 
+  step_interact(terms = ~lag_nitro_diff:lag_sbp_diff) #This is the interaction term
+
 ```
 
 ## Run the model using 5-fold cross-validation
 
-```{targets workflowLasso, tar_simple = TRUE}
+```{targets workflowRidgeResponse, tar_simple = TRUE}
 workflow()|>
-    add_recipe(recLasso)|>
-    add_model(specLasso)
+    add_recipe(recRidgeResponse)|>
+    add_model(specRidgeResponse)
 ```
 
-```{targets tuningLasso, tar_simple = TRUE}
+```{targets tuningRidgeResponse, tar_simple = TRUE}
     tune_grid(
-     workflowLasso,
-      resamples = foldsFive,
-      grid = gridLasso
+     workflowRidgeResponse,
+      resamples = foldsFiveResponse,
+      grid = gridRidgeResponse
     )
 ```
 

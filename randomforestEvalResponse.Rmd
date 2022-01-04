@@ -1,0 +1,18 @@
+
+---
+title: "Random Forest model response evaluation"
+output: html_document
+---
+
+```{r bestBoostResponse}
+tune::show_best(targets::tar_read(tuningRaceRFResponse))|>
+gt::gt()
+```
+
+## Final model evaluation
+
+**Only run when predictor set and parameters for the model are selected.**
+
+```{r finalFitRF}
+# targets::tar_read(RFFinal)|>collect_metrics()
+```

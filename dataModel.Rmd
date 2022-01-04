@@ -8,9 +8,6 @@ output: html_document
 library(targets)
 library(tidyverse)
 ```
-
-
-
 These targets are used to filter out observations where the bp was measured more than 15 minutes before and after a dose change
 
 ```{targets timeBefore}
@@ -35,35 +32,16 @@ tar_target(dataModel, data_formatted |>
     distinct(n_nitro, .keep_all = T) |>
     ungroup() |>
     mutate(sbp_diff = sbp_post - sbp_pre, no_diff = 0)|>
-    na.omit())
-```
-
-```{targets splitId}
-  tar_target(splitId, dataModel |>
-    make_train_id(seed = 1, frac = 0.75))
-```
-
-```{targets initSplit}
-  tar_target(
-    initSplit,
-    custom_rsplit(
-      splitId,
-      which(splitId$train == 1),
-      which(splitId$train == 0)
-    )
-  )
+    na.omit()) 
+  
 ```
 
 ```{targets training}
-  tar_target(training, training(initSplit))
-```
-
-```{targets testing}
-  tar_target(testing, testing(initSplit))
+  tar_target(training, dataModel)
 ```
 
 ```{targets foldsIndex}
-  tar_target(foldsIndex, make_kfold(training, 5))
+  tar_target(foldsIndex, make_kfold(dataModel, 5))
 ```
 
 ```{targets foldsFive}
@@ -78,15 +56,6 @@ Next we find the baseline metric for comparison. The predictions need to be bett
 
 ```{targets baselineTraining}
   tar_target(baselineTraining, training |>
-    metrics(
-      truth = sbp_post,
-      estimate = sbp_pre
-    ))
-```
-
-
-```{targets baselineTesting}
-  tar_target(baselineTesting, testing |>
     metrics(
       truth = sbp_post,
       estimate = sbp_pre

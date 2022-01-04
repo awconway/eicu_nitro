@@ -1,0 +1,69 @@
+
+---
+title: "Data for models"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+library(targets)
+library(tidyverse)
+```
+These targets are used to filter out observations where the bp was measured more than 15 minutes before and after a dose change
+
+```{targets timeBefore}
+  tar_target(time_before, 15)
+```
+
+```{targets timeAfter}
+  tar_target(time_after, 15)
+```
+
+
+First we filter to the data to we need and create splits for cross-fold validation.
+
+```{targets multiples, tar_simple=TRUE}
+dataModel |> 
+  group_by (id) |>
+  count() |>
+  arrange(desc(n)) |>
+  filter(n > 1) |>
+  pull (id)
+```
+
+```{targets trainingResponse, tar_simple=TRUE}
+ dataModel |> 
+    filter(id %in% multiples) |>
+    group_by(id) |>
+    mutate(lag_nitro_pre = lag(nitro_pre),
+           lag_nitro_post = lag(nitro_post),
+            lag_sbp_pre = lag(sbp_pre),
+           lag_sbp_post = lag(sbp_post),
+           lag_nitro_diff = lag_nitro_post - lag_nitro_pre,
+           lag_sbp_diff = lag_sbp_post - lag_sbp_pre) |> 
+    mutate(first_titration = row_number(n_nitro)) |>
+    filter(first_titration != 1) |> 
+  ungroup()
+```
+
+```{targets foldsIndexResponse}
+  tar_target(foldsIndexResponse, make_kfold(trainingResponse, 5))
+```
+
+```{targets foldsFiveResponse}
+  tar_target(foldsFiveResponse, 
+  group_vfold_cv(foldsIndexResponse,
+    group = fold,
+    v = 5
+  ))
+```
+
+Next we find the baseline metric for comparison. The predictions need to be better than just passing in the 'pre' sbp as a prediction - we'll call this the baseline.
+
+```{targets baselineTrainingResponse}
+  tar_target(baselineTrainingResponse, trainingResponse |>
+    metrics(
+      truth = sbp_post,
+      estimate = sbp_pre
+    ))
+```
+

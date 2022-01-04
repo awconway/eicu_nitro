@@ -1,4 +1,4 @@
-tar_target(recBoost, recipe(sbp_post ~ sbp_pre +
+tar_target(recBoostResponse, recipe(sbp_post ~ sbp_pre +
     nitro_pre +
     nitro_diff_mcg +
     total_nitro +
@@ -7,8 +7,10 @@ tar_target(recBoost, recipe(sbp_post ~ sbp_pre +
     time_since_nitro +
     sbp_pre_mean_60 +
     sbp_pre_sd_60 +
-    pain_score,
-  data = training
+    pain_score +
+    lag_nitro_diff +
+    lag_sbp_diff,
+    data = trainingResponse
   )|>
   step_dummy(all_nominal_predictors())
-  )
+  ) #need to add interaction term 
