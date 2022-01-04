@@ -1,7 +1,0 @@
-tar_target(specLasso, {
-    linear_reg(
-      penalty = tune(),
-      mixture = tune()
-    ) |>
-      set_engine("glmnet")
-})

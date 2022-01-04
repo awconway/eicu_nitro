@@ -14,7 +14,8 @@ We see that the lasso model performed better with lower amounts of regularizatio
 
 ```{r}
 targets::tar_read(tuningLassoResponse) |>
-autoplot()
+autoplot() |> 
+theme_minimal()
 ```
 
 ## Show the best models for the grid search

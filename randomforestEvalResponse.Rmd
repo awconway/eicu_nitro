@@ -3,10 +3,17 @@
 title: "Random Forest model response evaluation"
 output: html_document
 ---
-
+```{r}
+library(tidymodels)
+```
 ```{r bestBoostResponse}
 tune::show_best(targets::tar_read(tuningRaceRFResponse))|>
 gt::gt()
+```
+
+```{r}
+targets::tar_read(tuningRaceRFResponse)  |> 
+autoplot()
 ```
 
 ## Final model evaluation
