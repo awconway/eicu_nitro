@@ -432,6 +432,9 @@ tar_target(trainingResponse, {
       truth = sbp_post,
       estimate = sbp_pre
     )),
+##Preprocessing steps include normalization, a Yeo-Johnson transformation for variables with many zero values and principal components analysis for the variables that are highly correlated.
+##Predictors used here are restricted to those that can be derived from just a medication infusion device and physiological monitoring device. Clinical predictors (age, gender, medical conditions etc) were not included.**
+
 tar_target(recLassoResponse, {
   recipe(sbp_post ~
   sbp_pre +
@@ -452,24 +455,156 @@ tar_target(recLassoResponse, {
     step_normalize(
       all_numeric_predictors()
     )|>
-    step_pca(
+    step_pca( #creates a specification of a recipe step that will convert numeric data into one or more principal components.
     sbp_pre_mean_60,
     sbp_pre
     ) |> 
   step_interact(terms = ~lag_nitro_diff:lag_sbp_diff) #This is the interaction term
 }),
+## Run the model using 5-fold cross-validation
 tar_target(workflowLassoResponse, {
   workflow()|>
     add_recipe(recLassoResponse)|>
     add_model(specLasso)
 }),
+
 tar_target(tuningLassoResponse, {
       tune_grid(
-     workflowLassoResponse,
+      workflowLassoResponse,
       resamples = foldsFiveResponse,
       grid = gridLasso
-    )
+      )
 }),
+
+#Ridge Model
+## Specifications for the ridge model
+
+tar_target(specRidgeResponse, {
+linear_reg(
+  penalty = tune(),
+  mixture = 0 #Changed from 1 to 0
+) |>
+  set_engine("glmnet")
+}),
+## Grid search to determine the best value for the penaly parameter (i.e. amount of regularization)
+tar_target(gridRidge, {
+    dials::grid_regular(dials::penalty(),
+    levels = 100
+)
+}),
+## Recipe for the model
+tar_target(recRidgeResponse, {
+recipe(sbp_post ~
+         sbp_pre +
+         nitro_diff_mcg +
+         total_nitro +
+         n_nitro +
+         nitro_time +
+         sbp_pre_mean_60 +
+         sbp_pre_sd_60 +
+         pain_score +
+         lag_nitro_diff +
+         lag_sbp_diff,
+       data = trainingResponse
+) |>
+  step_YeoJohnson(
+    n_nitro, nitro_time, total_nitro, sbp_pre_sd_60, pain_score
+  ) |>
+  step_normalize(
+    all_numeric_predictors()
+  )|>
+  step_pca(
+    sbp_pre_mean_60,
+    sbp_pre
+  ) |> 
+  step_interact(terms = ~lag_nitro_diff:lag_sbp_diff) #This is the interaction term
+}),
+
+## Run the model using 5-fold cross-validation
+tar_target(workflowRidgeResponse, {
+workflow()|>
+  add_recipe(recRidgeResponse)|>
+  add_model(specRidgeResponse)
+}),
+tar_target(tuningRidgeResponse, {
+tune_grid(
+  workflowRidgeResponse,
+  resamples = foldsFiveResponse,
+  grid = gridRidgeResponse
+)
+}),
+
+#XGBoost model
+## Recipe for the model
+
+tar_target(recBoostResponse, recipe(sbp_post ~ sbp_pre +
+                                      nitro_pre +
+                                      nitro_diff_mcg +
+                                      total_nitro +
+                                      n_nitro +
+                                      nitro_time +
+                                      time_since_nitro +
+                                      sbp_pre_mean_60 +
+                                      sbp_pre_sd_60 +
+                                      pain_score +
+                                      lag_nitro_diff +
+                                      lag_sbp_diff,
+                                    data = trainingResponse
+|>
+  step_dummy(all_nominal_predictors())
+|>
+  step_interact(terms = ~lag_nitro_diff:lag_sbp_diff) #This is the interaction term
+),
+tar_target(
+  specBoostResponse,  ## Model specification
+  boost_tree(
+    # trees = 500,
+    # min_n = 30,
+    # learn_rate = 0.015,
+    # sample_size = 0.5, #0.5 was best
+    # tree_depth = 1,
+    trees = tune(),
+    min_n = tune(),
+    mtry = tune(),
+    learn_rate = tune(),
+    sample_size = tune(),
+    tree_depth = tune(),
+    loss_reduction = tune()
+  ) |>
+    set_engine("xgboost")|>
+    set_mode("regression")
+),
+tar_target(
+ workflowBoostResponse,
+  workflow()|>
+    add_recipe(recBoost)|>
+    add_model(specBoost)
+),
+tar_target(gridBoostResponse, #Grid search ranges for tuning model parameters
+           grid_max_entropy(
+             tree_depth(c(8, 15)),
+             min_n(c(20L, 40L)),
+             mtry(c(4L, 6L)),
+             loss_reduction(),
+             sample_size = sample_prop(c(0.5,1.0)),
+             learn_rate(c(-3,-2)),
+             trees(c(500, 5000)),
+             size = 50
+           )
+),
+
+#The tune_race_anova function can be used to speed up the process of finding suitable parameters for the model. Results are returned from 5-fold cross validation. 
+
+tar_target(tuningRaceBoostResponse,
+           tune_race_anova(
+             workflowBoost,
+             foldsFive,
+             grid = gridBoostResponse,#is this gridBoostResponse or gridBoost
+             metrics = mset,
+             control = control_race(verbose_elim = TRUE)
+           )
+),
+
 # randomforest model
 tar_target(recRFResponse, recipe(sbp_post ~ sbp_pre +
     nitro_pre +
@@ -521,3 +656,5 @@ tar_target(recRFResponse, recipe(sbp_post ~ sbp_pre +
       )
   )
 )
+)
+
