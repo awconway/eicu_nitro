@@ -589,8 +589,7 @@ tar_target(recBoost, recipe(sbp_post ~ sbp_pre +
                               lag_nitro_diff +
                               lag_sbp_diff,
                             data = trainingResponse
-),
-
+)),
 tar_target(
   specBoost,
   boost_tree(
@@ -633,7 +632,7 @@ tar_target(gridBoost,
 tar_target(tuningRaceBoost,
            tune_race_anova(
              workflowBoost,
-             foldsFive,
+             foldsFiveResponse,
              grid = gridBoost,
              metrics = mset,
              control = control_race(verbose_elim = TRUE)
@@ -689,5 +688,4 @@ tar_target(recRFResponse, recipe(sbp_post ~ sbp_pre +
         control = control_race(verbose_elim = TRUE)
       )
   )
-)
 )
