@@ -5,7 +5,7 @@ output: html_document
 ---
 
 ```{r bestBoostResponse}
-tune::show_best(targets::tar_read(tuningRaceBoostResponse))|>
+tune::show_best(targets::tar_read(tuningRaceBoost))|>
 gt::gt()
 ```
 

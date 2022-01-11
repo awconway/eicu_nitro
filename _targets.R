@@ -1,4 +1,7 @@
 library(targets)
+library(tidymodels)
+library(dplyr)
+
 options(tidyverse.quiet = TRUE)
 
 tar_option_set(packages = c(
@@ -432,9 +435,6 @@ tar_target(trainingResponse, {
       truth = sbp_post,
       estimate = sbp_pre
     )),
-##Preprocessing steps include normalization, a Yeo-Johnson transformation for variables with many zero values and principal components analysis for the variables that are highly correlated.
-##Predictors used here are restricted to those that can be derived from just a medication infusion device and physiological monitoring device. Clinical predictors (age, gender, medical conditions etc) were not included.**
-
 tar_target(recLassoResponse, {
   recipe(sbp_post ~
   sbp_pre +
@@ -444,119 +444,155 @@ tar_target(recLassoResponse, {
     nitro_time +
      sbp_pre_mean_60 +
      sbp_pre_sd_60 +
-    pain_score +
     lag_nitro_diff +
     lag_sbp_diff,
     data = trainingResponse
   ) |>
     step_YeoJohnson(
-      n_nitro, nitro_time, total_nitro, sbp_pre_sd_60, pain_score
+      n_nitro, nitro_time, total_nitro, sbp_pre_sd_60
     ) |>
     step_normalize(
       all_numeric_predictors()
     )|>
-    step_pca( #creates a specification of a recipe step that will convert numeric data into one or more principal components.
+    step_pca(
     sbp_pre_mean_60,
     sbp_pre
     ) |> 
   step_interact(terms = ~lag_nitro_diff:lag_sbp_diff) #This is the interaction term
 }),
-## Run the model using 5-fold cross-validation
 tar_target(workflowLassoResponse, {
   workflow()|>
     add_recipe(recLassoResponse)|>
     add_model(specLasso)
 }),
-
 tar_target(tuningLassoResponse, {
       tune_grid(
-      workflowLassoResponse,
+     workflowLassoResponse,
       resamples = foldsFiveResponse,
       grid = gridLasso
-      )
+    )
 }),
+# Linear Regression model 
+tar_target(recLRResponse, 
+           recipe(sbp_post ~
+                    sbp_pre +
+                    nitro_pre +
+                    nitro_diff_mcg +
+                    total_nitro +
+                    n_nitro +
+                    nitro_time +
+                    time_since_nitro +
+                    sbp_pre_mean_60 +
+                    sbp_pre_sd_60 +
+                    lag_nitro_diff +
+                    lag_sbp_diff,
+                  data = trainingResponse
+           ) |>
+             step_YeoJohnson(
+               n_nitro, nitro_time, total_nitro, sbp_pre_sd_60
+             ) |>
+             step_normalize(
+               all_numeric_predictors()
+             )|>
+             step_pca(
+               sbp_pre_mean_60,
+               sbp_pre
+             ) |> 
+             step_interact(terms = ~lag_nitro_diff:lag_sbp_diff) #This is the interaction term
+),
+tar_target(specLR, 
+           linear_reg(
+             mode = "regression",
+           ) |>  
+             set_engine('lm')
+),
+tar_target(workflowLRResponse, 
+           workflow()|>
+             add_recipe(recLRResponse)|>
+             add_model(specLR)
+),
+
+tar_target(tuningLRResponse,
+           fit_resamples(
+             workflowLRResponse,
+             resamples = foldsFiveResponse
+           )
+),
 
 #Ridge Model
 ## Specifications for the ridge model
-
 tar_target(specRidgeResponse, {
-linear_reg(
-  penalty = tune(),
-  mixture = 0 #Changed from 1 to 0
-) |>
-  set_engine("glmnet")
+  linear_reg(
+    penalty = tune(),
+    mixture = 0 #Changed from 1 to 0
+  ) |>
+    set_engine("glmnet")
 }),
-## Grid search to determine the best value for the penaly parameter (i.e. amount of regularization)
+## Grid search to determine the best value for the penalty parameter (i.e. amount of regularization)
 tar_target(gridRidge, {
-    dials::grid_regular(dials::penalty(),
-    levels = 100
-)
+  dials::grid_regular(dials::penalty(),
+                      levels = 100
+  )
 }),
 ## Recipe for the model
 tar_target(recRidgeResponse, {
-recipe(sbp_post ~
-         sbp_pre +
-         nitro_diff_mcg +
-         total_nitro +
-         n_nitro +
-         nitro_time +
-         sbp_pre_mean_60 +
-         sbp_pre_sd_60 +
-         pain_score +
-         lag_nitro_diff +
-         lag_sbp_diff,
-       data = trainingResponse
-) |>
-  step_YeoJohnson(
-    n_nitro, nitro_time, total_nitro, sbp_pre_sd_60, pain_score
+  recipe(sbp_post ~
+           sbp_pre +
+           nitro_diff_mcg +
+           total_nitro +
+           n_nitro +
+           nitro_time +
+           sbp_pre_mean_60 +
+           sbp_pre_sd_60 +
+           lag_nitro_diff +
+           lag_sbp_diff,
+         data = trainingResponse
   ) |>
-  step_normalize(
-    all_numeric_predictors()
-  )|>
-  step_pca(
-    sbp_pre_mean_60,
-    sbp_pre
-  ) |> 
-  step_interact(terms = ~lag_nitro_diff:lag_sbp_diff) #This is the interaction term
+    step_YeoJohnson(
+      n_nitro, nitro_time, total_nitro, sbp_pre_sd_60
+    ) |>
+    step_normalize(
+      all_numeric_predictors()
+    )|>
+    step_pca(
+      sbp_pre_mean_60,
+      sbp_pre
+    ) |> 
+    step_interact(terms = ~lag_nitro_diff:lag_sbp_diff) #This is the interaction term
 }),
 
 ## Run the model using 5-fold cross-validation
 tar_target(workflowRidgeResponse, {
-workflow()|>
-  add_recipe(recRidgeResponse)|>
-  add_model(specRidgeResponse)
+  workflow()|>
+    add_recipe(recRidgeResponse)|>
+    add_model(specRidgeResponse)
 }),
 tar_target(tuningRidgeResponse, {
-tune_grid(
-  workflowRidgeResponse,
-  resamples = foldsFiveResponse,
-  grid = gridRidgeResponse
-)
+  tune_grid(
+    workflowRidgeResponse,
+    resamples = foldsFiveResponse,
+    grid = gridRidge
+  )
 }),
 
+#XGBoost
 #XGBoost model
-## Recipe for the model
-
-tar_target(recBoostResponse, recipe(sbp_post ~ sbp_pre +
-                                      nitro_pre +
-                                      nitro_diff_mcg +
-                                      total_nitro +
-                                      n_nitro +
-                                      nitro_time +
-                                      time_since_nitro +
-                                      sbp_pre_mean_60 +
-                                      sbp_pre_sd_60 +
-                                      pain_score +
-                                      lag_nitro_diff +
-                                      lag_sbp_diff,
-                                    data = trainingResponse
-|>
-  step_dummy(all_nominal_predictors())
-|>
-  step_interact(terms = ~lag_nitro_diff:lag_sbp_diff) #This is the interaction term
+tar_target(recBoost, recipe(sbp_post ~ sbp_pre +
+                              nitro_pre +
+                              nitro_diff_mcg +
+                              total_nitro +
+                              n_nitro +
+                              nitro_time +
+                              time_since_nitro +
+                              sbp_pre_mean_60 +
+                              sbp_pre_sd_60 +
+                              lag_nitro_diff +
+                              lag_sbp_diff,
+                            data = trainingResponse
 ),
+
 tar_target(
-  specBoostResponse,  ## Model specification
+  specBoost,
   boost_tree(
     # trees = 500,
     # min_n = 30,
@@ -574,13 +610,14 @@ tar_target(
     set_engine("xgboost")|>
     set_mode("regression")
 ),
+
 tar_target(
- workflowBoostResponse,
+  workflowBoost,
   workflow()|>
     add_recipe(recBoost)|>
     add_model(specBoost)
 ),
-tar_target(gridBoostResponse, #Grid search ranges for tuning model parameters
+tar_target(gridBoost,
            grid_max_entropy(
              tree_depth(c(8, 15)),
              min_n(c(20L, 40L)),
@@ -593,13 +630,11 @@ tar_target(gridBoostResponse, #Grid search ranges for tuning model parameters
            )
 ),
 
-#The tune_race_anova function can be used to speed up the process of finding suitable parameters for the model. Results are returned from 5-fold cross validation. 
-
-tar_target(tuningRaceBoostResponse,
+tar_target(tuningRaceBoost,
            tune_race_anova(
              workflowBoost,
              foldsFive,
-             grid = gridBoostResponse,#is this gridBoostResponse or gridBoost
+             grid = gridBoost,
              metrics = mset,
              control = control_race(verbose_elim = TRUE)
            )
@@ -615,7 +650,6 @@ tar_target(recRFResponse, recipe(sbp_post ~ sbp_pre +
     time_since_nitro +
     sbp_pre_mean_60 +
     sbp_pre_sd_60 +
-    pain_score +
     lag_nitro_diff +
     lag_sbp_diff,
     data = trainingResponse
@@ -657,4 +691,3 @@ tar_target(recRFResponse, recipe(sbp_post ~ sbp_pre +
   )
 )
 )
-

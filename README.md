@@ -213,7 +213,7 @@ If no predictors are added or functions changed, `targets::tar_make()` is all th
         ┃   ┣━━ 🎯 workflowBoost <span style="color:#808080"> - workflow for the model</span>
         ┃   ┣━━ 🎯 resampleBoost <span style="color:#808080"> - trained models using 5-fold cross-validation</span>
         ┃   ┗━━ 🎯 boostFinal <span style="color:#808080"> - final fit using best model from parameter tuning</span>
-        ┗━━ 📄 <span style="font-weight: bold;"><a href="lassoEval.Rmd">boostEval.Rmd</a></span>
+        ┗━━ 📄 <span style="font-weight: bold;"><a href="boostEval.Rmd">boostEval.Rmd</a></span>
             ┗━━ 📊 Evaluation of models
 </pre>
     
