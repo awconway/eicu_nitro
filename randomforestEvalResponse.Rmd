@@ -7,12 +7,12 @@ output: html_document
 library(tidymodels)
 ```
 ```{r bestBoostResponse}
-tune::show_best(targets::tar_read(tuningRaceRFResponse))|>
+tune::show_best(targets::tar_read(tuningGridRFResponse))|>
 gt::gt()
 ```
 
 ```{r}
-targets::tar_read(tuningRaceRFResponse)  |> 
+targets::tar_read(tuningGridRFResponse)  |> 
 autoplot()
 ```
 
@@ -21,5 +21,7 @@ autoplot()
 **Only run when predictor set and parameters for the model are selected.**
 
 ```{r finalFitRF}
-# targets::tar_read(RFFinal)|>collect_metrics()
+targets::tar_read(RFFinal)|>collect_metrics()
+  
+
 ```

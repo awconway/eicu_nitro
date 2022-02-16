@@ -14,5 +14,5 @@ gt::gt()
 **Only run when predictor set and parameters for the model are selected.**
 
 ```{r finalFitBoost}
-# targets::tar_read(boostFinal)|>collect_metrics()
+#targets::tar_read(boostFinal)|>collect_metrics()
 ```

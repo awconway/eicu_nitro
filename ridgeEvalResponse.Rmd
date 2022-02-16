@@ -43,5 +43,6 @@ mutate(
 ggplot(aes(x = Importance, y = Variable, fill = Sign)) +
     geom_col() +
     scale_x_continuous(expand = c(0, 0)) +
+  theme(panel.background = element_blank()) +
     labs(y = NULL)
 ```

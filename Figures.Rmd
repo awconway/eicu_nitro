@@ -1,0 +1,61 @@
+library(ggplot2)
+library(magrittr)
+library(dplyr)
+library(tidyverse)
+library(ggsci)
+library(ggpubr)
+
+#Figure 1- Patient flow 
+library(DiagrammeR)
+
+```{r}
+grViz("digraph flowchart {
+      # node definitions with substituted label text
+      node [fontname = Helvetica, shape = rectangle]        
+      tab1 [label = '@@1']
+      tab2 [label = '@@2']
+      tab3 [label = '@@3']
+      tab4 [label = '@@4']
+      tab5 [label = '@@5']
+      
+# edge definitions with the node IDs
+      tab1 -> tab2;
+      tab2-> tab3;
+      tab3-> tab4;
+      tab4 -> tab5;
+      }
+
+      [1]: '2062 patients from the eICU database were on nitroglyerin infusion' 
+      [2]: '1893 patients had coresponding blood pressure data' 
+      [3]: '1277 patients with SBP, nitroglycerin infusion rate, and titration within filtration criteria'
+      [4]: '693 patients with a SBP measurement within 15 minutes before and after a nitroglycerin dose change'
+      [5]: '326 patients had at least 1 nitroglycerin titration'
+      "
+      )
+```
+
+#Total eICU admissions N= 139,367, 208 hospitals
+
+#Figure 2- Hospital Admissions 
+# data frame created
+data <- data.frame(
+  Hospital=c(1:40),
+  Patients=c(1,2,9,20,4,2,6,25,2,12,16,23,1,4,2,1,4,1,25,6,11,7,1,10,49,8,14,6,1,7,6,10,1,1,2,6,9,1,4,6)
+  )
+
+# bar is created with the help of# grom_bar() and ggplot() function, aes(fill= Patients)in line 18
+ggp <- ggplot(data, aes(x=Hospital, y= Patients)) +
+  geom_bar(stat = "identity", fill = "#00abff") +
+  labs(title= "Number of Patients from each Hospital",
+       x= NULL,
+       y="Patients") +
+theme(axis.ticks.y = element_blank(),
+              axis.text.y = element_blank(),
+      panel.background = element_blank()) 
+
+# complete graph get flipped with the
+# help of coord_flip() function
+ggp + coord_flip()
+
+library(lares)
+

@@ -397,11 +397,13 @@ list(
     ) |>
       set_engine("glmnet")
 }),
+
 tar_target(gridLasso, {
-    dials::grid_regular(dials::penalty(),
-      levels = 100
-    )
+  dials::grid_regular(dials::penalty(),
+                      levels = 100
+  )
 }),
+
 tar_target(multiples, {
   dataModel |> 
   group_by (id) |>
@@ -414,7 +416,7 @@ tar_target(trainingResponse, {
    dataModel |> 
     filter(id %in% multiples) |>
     group_by(id) |>
-    mutate(lag_nitro_pre = lag(nitro_pre),
+    mutate(lag_nitro_pre = lag(nitro_pre), 
            lag_nitro_post = lag(nitro_post),
             lag_sbp_pre = lag(sbp_pre),
            lag_sbp_post = lag(sbp_post),
@@ -458,7 +460,7 @@ tar_target(recLassoResponse, {
     sbp_pre_mean_60,
     sbp_pre
     ) |> 
-  step_interact(terms = ~lag_nitro_diff:lag_sbp_diff) #This is the interaction term
+  step_interact(terms = ~lag_nitro_diff:lag_sbp_diff)  #This is the interaction term
 }),
 tar_target(workflowLassoResponse, {
   workflow()|>
@@ -468,10 +470,17 @@ tar_target(workflowLassoResponse, {
 tar_target(tuningLassoResponse, {
       tune_grid(
      workflowLassoResponse,
+     control = control_grid(save_pred = TRUE),
       resamples = foldsFiveResponse,
-      grid = gridLasso
-    )
-}),
+      grid = gridLasso)
+    }),
+
+  tar_target(lassopredictions,{
+    tuningLassoResponse |>
+    collect_predictions()
+  }),
+
+
 # Linear Regression model 
 tar_target(recLRResponse, 
            recipe(sbp_post ~
@@ -515,9 +524,9 @@ tar_target(workflowLRResponse,
 tar_target(tuningLRResponse,
            fit_resamples(
              workflowLRResponse,
-             resamples = foldsFiveResponse
-           )
+             resamples = foldsFiveResponse)
 ),
+
 
 #Ridge Model
 ## Specifications for the ridge model
@@ -567,7 +576,7 @@ tar_target(workflowRidgeResponse, {
     add_recipe(recRidgeResponse)|>
     add_model(specRidgeResponse)
 }),
-tar_target(tuningRidgeResponse, {
+fit <- tar_target(tuningRidgeResponse, {
   tune_grid(
     workflowRidgeResponse,
     resamples = foldsFiveResponse,
@@ -687,5 +696,47 @@ tar_target(recRFResponse, recipe(sbp_post ~ sbp_pre +
         metrics = mset,
         control = control_race(verbose_elim = TRUE)
       )
-  )
 )
+)
+
+#Figure 3- Best Results from each model 
+library("ggplot2")
+library("extrafont")
+
+options(scipen=100, digits=6)
+options(max.print = 500000000)
+
+IV <-c("Linear", "Lasso", "Ridge", "XGBoost", "Random Forest")
+RMSE <- c( 13.3, 13.3, 13.3, 13.7, 13.7)
+LCI <- c(12.07, 12.13, 12.2, 12.38, 12.58)
+UCI <- c(14.53, 14.47, 14.41, 15.02, 14.82)
+
+
+A$IV<-factor(A$IV, levels=c("Random Forest",
+                            "XGBoost",
+                            "Ridge",
+                            "Lasso",
+                            "Linear"))
+
+
+fp <-ggplot(data=A, aes(x=IV, y=RMSE, ymin=LCI, ymax=UCI)) +
+  geom_pointrange() + 
+  geom_hline(yintercept=0, lty=2, size =1) +  # add a dotted line at x=1 after flip
+  geom_errorbar(aes(ymin=LCI, ymax=UCI), width=0.5, cex=1)+ # Makes whiskers on the range (more aesthetically pleasing)
+  coord_flip() +
+  geom_point(shape = 15, color= "blue", size = 2) + # specifies the size and shape of the geompoint
+  ggtitle("")+ # Blank Title for the Graph
+  xlab("Models") + # Label on the Y axis (flipped specification do to coord_flip)
+  ylab("RMSE (95% CI)") +
+  scale_y_continuous(limits = c(11,16), breaks = c(11,12,13,14,15,16))+ # limits and tic marks on X axis (flipped specification do to coord_flip)
+  theme(line = element_line(colour = "black", size = 3), # My personal theme for GGplots
+        strip.background = element_rect(fill="gray90"), 
+        legend.position ="none", 
+        axis.line.x = element_line(colour = "black"), 
+        axis.line.y = element_blank(), 
+        panel.border= element_blank(), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.ticks = element_blank())
+print(fp)

@@ -14,8 +14,7 @@ We see that the lasso model performed better with lower amounts of regularizatio
 
 ```{r}
 targets::tar_read(tuningLassoResponse) |>
-autoplot() |> 
-theme_minimal()
+autoplot() 
 ```
 
 ## Show the best models for the grid search
@@ -43,6 +42,7 @@ mutate(
 ) |>
 ggplot(aes(x = Importance, y = Variable, fill = Sign)) +
     geom_col() +
+  theme(panel.background = element_blank()) +
     scale_x_continuous(expand = c(0, 0)) +
     labs(y = NULL)
 ```
@@ -52,5 +52,17 @@ ggplot(aes(x = Importance, y = Variable, fill = Sign)) +
 Only run when predictor set and parameters for the model are selected.
 
 ```{r}
-# targets::tar_read(lassoFinal)|>collect_metrics()
+# targets::tar_read(tuningLassoResponse)|>collect_metrics()
+
+targets::tar_read(tuningLassoResponse)|>collect_metrics()
+
+collect_predictions(tuningLassoResponse)
+
+targets::tar_read(tuningLassoResponse) |>
+
+collect_predictions(tuningLassoResponse) |>
+  arrange(.row)
+
+
+
 ```
